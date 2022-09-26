@@ -81,7 +81,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 			// extends
 			[ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'extends'), { extends: jsonObj.extends }] as const,
 			// files
-			[ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'files' && p.children[1].type === 'array'), { files: jsonObj.files, compilerOptions: jsonObj.compilerOptions, extends: jsonObj.extends }] as const,
+			[ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'files' && p.children[1].type === 'array'), { files: jsonObj.files, compilerOptions: jsonObj.compilerOptions }] as const,
 		]) {
 			if (!option) continue;
 			const start = document.positionAt(option.offset);
@@ -121,7 +121,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 						uri: document.uri,
 						position: start,
 						getFileNames() {
-							const content = ts.parseJsonConfigFileContent({ include: [pathNode.value], compilerOptions: jsonObj.compilerOptions, extends: jsonObj.extends }, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+							const content = ts.parseJsonConfigFileContent({ include: [pathNode.value], compilerOptions: jsonObj.compilerOptions }, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
 							return content.fileNames;
 						},
 					});

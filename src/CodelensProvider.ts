@@ -250,7 +250,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 			}
 			if (!addFileNames.size && !removeFileNames.size) {
 				codeLens.command = {
-					title: '0 matches',
+					title: 0 + (data.isTotal ? ' files' : ' matches'),
 					command: '',
 					arguments: [],
 				};

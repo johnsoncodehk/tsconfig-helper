@@ -7,7 +7,9 @@ import type { FileExtensionInfo } from 'typescript';
 const codeLensData = new WeakMap<vscode.CodeLens, {
 	uri: vscode.Uri,
 	position: vscode.Position,
-	getFileNames(): string[],
+	getOriginalFileNames?(): string[],
+	getNewFileNames(): string[],
+	isTotal?: boolean,
 }>();
 
 export class CodelensProvider implements vscode.CodeLensProvider {
@@ -68,49 +70,77 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 			codeLensData.set(codeLens, {
 				uri: document.uri,
 				position: start,
-				getFileNames() {
+				getNewFileNames() {
 					const jsonConfigFile = ts.readJsonConfigFile(document.fileName, readFile);
 					const content = ts.parseJsonSourceFileConfigFileContent(jsonConfigFile, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
 					return content.fileNames;
 				},
+				isTotal: true,
 			});
 			codeLenses.push(codeLens);
 		}
 
-		for (const [option, options] of [
-			// extends
-			[ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'extends'), { extends: jsonObj.extends }] as const,
-			// files
-			[ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'files' && p.children[1].type === 'array'), { files: jsonObj.files, compilerOptions: jsonObj.compilerOptions }] as const,
-		]) {
-			if (!option) continue;
-			const start = document.positionAt(option.offset);
-			const end = document.positionAt(option.offset + option.length);
+		const extendsOption = ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'extends');
+		if (extendsOption) {
+			const start = document.positionAt(extendsOption.offset);
+			const end = document.positionAt(extendsOption.offset + extendsOption.length);
 			const range = new vscode.Range(start, end);
 			const codeLens = new vscode.CodeLens(range);
 			codeLensData.set(codeLens, {
 				uri: document.uri,
 				position: start,
-				getFileNames() {
-					const content = ts.parseJsonConfigFileContent(options, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+				getOriginalFileNames() {
+					return [];
+				},
+				getNewFileNames() {
+					const content = ts.parseJsonConfigFileContent({
+						extends: jsonObj.extends,
+						compilerOptions: jsonObj.compilerOptions,
+						files: jsonObj.files ? [] : undefined,
+						include: jsonObj.include ? [] : undefined,
+						exclude: jsonObj.exclude ? [] : undefined,
+					}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
 					return content.fileNames;
 				},
 			});
 			codeLenses.push(codeLens);
 		}
 
-		for (const includeValueNode of [
-			// include
-			ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'include' && p.children[1].type === 'array')?.children?.[1],
-			// paths
-			...(
-				ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'compilerOptions' && p.children[1].type === 'object')?.children?.[1]
-					?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'paths' && p.children[1].type === 'object')?.children?.[1]
-					.children?.map(child => child.children?.[1])
-				?? []
-			),
-		]) {
-			if (!includeValueNode?.children) continue;
+		const filesOption = ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'files' && p.children[1].type === 'array');
+		if (filesOption) {
+			const start = document.positionAt(filesOption.offset);
+			const end = document.positionAt(filesOption.offset + filesOption.length);
+			const range = new vscode.Range(start, end);
+			const codeLens = new vscode.CodeLens(range);
+			codeLensData.set(codeLens, {
+				uri: document.uri,
+				position: start,
+				getOriginalFileNames() {
+					const content = ts.parseJsonConfigFileContent({
+						extends: jsonObj.extends,
+						compilerOptions: jsonObj.compilerOptions,
+						files: [],
+						include: [],
+						exclude: [],
+					}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+					return content.fileNames;
+				},
+				getNewFileNames() {
+					const content = ts.parseJsonConfigFileContent({
+						extends: jsonObj.extends,
+						compilerOptions: jsonObj.compilerOptions,
+						files: jsonObj.files,
+						include: [],
+						exclude: [],
+					}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+					return content.fileNames;
+				},
+			});
+			codeLenses.push(codeLens);
+		}
+
+		const includeValueNode = ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'include' && p.children[1].type === 'array')?.children?.[1];
+		if (includeValueNode?.children) {
 			for (const pathNode of includeValueNode.children) {
 				if (pathNode.type === 'string' && pathNode.value) {
 					const start = document.positionAt(pathNode.offset);
@@ -120,8 +150,24 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 					codeLensData.set(codeLens, {
 						uri: document.uri,
 						position: start,
-						getFileNames() {
-							const content = ts.parseJsonConfigFileContent({ include: [pathNode.value], compilerOptions: jsonObj.compilerOptions }, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+						getOriginalFileNames() {
+							const content = ts.parseJsonConfigFileContent({
+								extends: jsonObj.extends,
+								compilerOptions: jsonObj.compilerOptions,
+								files: jsonObj.files,
+								include: [],
+								exclude: [],
+							}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+							return content.fileNames;
+						},
+						getNewFileNames() {
+							const content = ts.parseJsonConfigFileContent({
+								extends: jsonObj.extends,
+								compilerOptions: jsonObj.compilerOptions,
+								files: jsonObj.files,
+								include: [pathNode.value],
+								exclude: [],
+							}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
 							return content.fileNames;
 						},
 					});
@@ -130,11 +176,8 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 			}
 		}
 
-		for (const excludeValueNode of [
-			// exclude
-			ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'exclude' && p.children[1].type === 'array')?.children?.[1],
-		]) {
-			if (!excludeValueNode?.children) continue;
+		const excludeValueNode = ast?.children?.find(p => p.type === 'property' && p.children?.[0].value === 'exclude' && p.children[1].type === 'array')?.children?.[1];
+		if (excludeValueNode?.children) {
 			for (const pathNode of excludeValueNode.children) {
 				if (pathNode.type === 'string' && pathNode.value) {
 					const start = document.positionAt(pathNode.offset);
@@ -144,27 +187,25 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 					codeLensData.set(codeLens, {
 						uri: document.uri,
 						position: start,
-						getFileNames() {
-							const originalConfig = ts.readJsonConfigFile(document.fileName, path => {
-								if (path === document.fileName) {
-									return document.getText().substring(0, excludeValueNode.offset)
-										+ '[]'
-										+ document.getText().substring(excludeValueNode.offset + excludeValueNode.length);
-								}
-								return readFile(path);
-							});
-							const excludeConfig = ts.readJsonConfigFile(document.fileName, path => {
-								if (path === document.fileName) {
-									return document.getText().substring(0, excludeValueNode.offset)
-										+ `["${pathNode.value}"]`
-										+ document.getText().substring(excludeValueNode.offset + excludeValueNode.length);
-								}
-								return readFile(path);
-							});
-							const originalContent = ts.parseJsonSourceFileConfigFileContent(originalConfig, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
-							const excludeContent = ts.parseJsonSourceFileConfigFileContent(excludeConfig, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
-							const originalFileNames = new Set(excludeContent.fileNames);
-							return originalContent.fileNames.filter(fileName => !originalFileNames.has(fileName));
+						getOriginalFileNames() {
+							const content = ts.parseJsonConfigFileContent({
+								extends: jsonObj.extends,
+								compilerOptions: jsonObj.compilerOptions,
+								files: jsonObj.files,
+								include: jsonObj.include,
+								exclude: [],
+							}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+							return content.fileNames;
+						},
+						getNewFileNames() {
+							const content = ts.parseJsonConfigFileContent({
+								extends: jsonObj.extends,
+								compilerOptions: jsonObj.compilerOptions,
+								files: jsonObj.files,
+								include: jsonObj.include,
+								exclude: [pathNode.value],
+							}, ts.sys, path.dirname(document.fileName), undefined, document.fileName, undefined, extraFileExtensions);
+							return content.fileNames;
 						},
 					});
 					codeLenses.push(codeLens);
@@ -178,12 +219,42 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 	public async resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
 		const data = codeLensData.get(codeLens);
 		if (data) {
-			const fileNames = data.getFileNames();
-			codeLens.command = {
-				title: fileNames.length + (fileNames.length === 1 ? ' target' : ' targets'),
-				command: fileNames.length ? 'tsconfig-helper.showReferences' : '',
-				arguments: [data.uri, data.position, fileNames],
-			};
+			const _originalFileNames = data.getOriginalFileNames?.();
+			const originalFileNames = new Set(_originalFileNames ?? []);
+			const newFileNames = new Set(data.getNewFileNames());
+			const addFileNames = new Set<string>();
+			const removeFileNames = new Set<string>();
+			for (const fileName of originalFileNames) {
+				if (!newFileNames.has(fileName)) {
+					removeFileNames.add(fileName);
+				}
+			}
+			for (const fileName of newFileNames) {
+				if (!originalFileNames.has(fileName)) {
+					addFileNames.add(fileName);
+				}
+			}
+			if (addFileNames.size) {
+				codeLens.command = {
+					title: addFileNames.size + (data.isTotal ? ' files' : ' matches'),
+					command: 'tsconfig-helper.showReferences',
+					arguments: [data.uri, data.position, [...addFileNames]],
+				};
+			}
+			if (removeFileNames.size) {
+				codeLens.command = {
+					title: removeFileNames.size + (data.isTotal ? ' files' : ' matches'),
+					command: 'tsconfig-helper.showReferences',
+					arguments: [data.uri, data.position, [...removeFileNames]],
+				};
+			}
+			if (!addFileNames.size && !removeFileNames.size) {
+				codeLens.command = {
+					title: '0 matches',
+					command: '',
+					arguments: [],
+				};
+			}
 		}
 		return codeLens;
 	}

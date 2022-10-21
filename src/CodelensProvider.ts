@@ -36,19 +36,11 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 
 		const extraFileExtensions: FileExtensionInfo[] = [];
 
-		if (vscode.workspace.getConfiguration('tsconfig-helper').get('extraFileExtensions.vue')) {
+		for (const ext of vscode.workspace.getConfiguration('tsconfig-helper').get<string[]>('extraFileExtensions') ?? []) {
 			extraFileExtensions.push({
-				extension: 'vue',
+				extension: ext,
 				isMixedContent: true,
 				scriptKind: ts.ScriptKind.Deferred,
-			});
-		}
-
-		if (vscode.workspace.getConfiguration('tsconfig-helper').get('extraFileExtensions.html')) {
-			extraFileExtensions.push({
-				extension: 'html',
-				isMixedContent: true,
-				scriptKind: ts.ScriptKind.JS,
 			});
 		}
 

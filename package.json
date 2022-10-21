@@ -30,13 +30,12 @@
 		"configuration": {
 			"title": "tsconfig Helper",
 			"properties": {
-				"tsconfig-helper.extraFileExtensions.vue": {
-					"type": "boolean",
-					"default": true
-				},
-				"tsconfig-helper.extraFileExtensions.html": {
-					"type": "boolean",
-					"default": false
+				"tsconfig-helper.extraFileExtensions": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [ "vue" ]
 				}
 			}
 		}

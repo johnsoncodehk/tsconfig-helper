@@ -1,54 +1,20 @@
 {
-	"name": "vscode-tsconfig-helper",
-	"version": "0.2.2",
+	"private": true,
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/johnsoncodehk/vscode-tsconfig-helper.git"
+		"url": "https://github.com/johnsoncodehk/tsconfig-helper.git"
 	},
-	"sponsor": {
-		"url": "https://github.com/sponsors/johnsoncodehk"
-	},
-	"icon": "images/icon.png",
-	"displayName": "TSConfig Helper",
-	"description": "Extra features in tsconfig.json",
-	"author": "johnsoncodehk",
-	"publisher": "johnsoncodehk",
-	"engines": {
-		"vscode": "^1.67.0"
-	},
-	"activationEvents": [
-		"onLanguage:jsonc"
-	],
-	"main": "out/extension",
 	"scripts": {
-		"build": "tsc",
-		"watch": "tsc --watch",
-		"pack": "yarn build && vsce package",
-		"release": "yarn build && vsce publish"
-	},
-	"contributes": {
-		"configuration": {
-			"title": "tsconfig Helper",
-			"properties": {
-				"tsconfig-helper.extraFileExtensions": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": [
-						"vue"
-					]
-				}
-			}
-		}
+		"build": "tsc -b tsconfig.build.json",
+		"watch": "npm run build && (npm run watch:tsc & npm run watch:esbuild)",
+		"watch:tsc": "tsc -b tsconfig.build.json -w",
+		"watch:esbuild": "cd ./packages/vscode && npm run watch",
+		"prerelease": "npm run build",
+		"pack": "cd ./packages/vscode && npm run pack",
+		"release": "cd ./packages/vscode && npm run release"
 	},
 	"devDependencies": {
 		"@types/node": "latest",
-		"@types/vscode": "1.67.0",
-		"typescript": "beta",
-		"vsce": "latest"
-	},
-	"dependencies": {
-		"jsonc-parser": "^3.2.0"
+		"typescript": "latest"
 	}
 }

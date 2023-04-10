@@ -9,6 +9,7 @@
 	"sponsor": {
 		"url": "https://github.com/sponsors/johnsoncodehk"
 	},
+	"icon": "images/icon.png",
 	"displayName": "TSConfig Helper",
 	"description": "Extra features in tsconfig.json",
 	"author": "johnsoncodehk",

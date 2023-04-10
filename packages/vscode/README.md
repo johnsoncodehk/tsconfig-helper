@@ -2,4 +2,4 @@
 
 Check the affected files for tsconfig path options.
 
-![Demo](images/demo.png)
+![Demo](https://github.com/johnsoncodehk/tsconfig-helper/raw/HEAD/packages/vscode/images/demo.png)

@@ -1,0 +1,55 @@
+{
+	"private": true,
+	"name": "vscode-tsconfig-helper",
+	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/johnsoncodehk/vscode-tsconfig-helper.git"
+	},
+	"sponsor": {
+		"url": "https://github.com/sponsors/johnsoncodehk"
+	},
+	"displayName": "TSConfig Helper",
+	"description": "Extra features in tsconfig.json",
+	"author": "johnsoncodehk",
+	"publisher": "johnsoncodehk",
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"activationEvents": [
+		"onLanguage:jsonc"
+	],
+	"contributes": {
+		"configuration": {
+			"title": "TSConfig Helper",
+			"properties": {
+				"tsconfig-helper.extraFileExtensions": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [
+						"vue"
+					]
+				}
+			}
+		}
+	},
+	"main": "client",
+	"scripts": {
+		"prebuild": "cd ../.. && npm run build",
+		"build": "node scripts/build -- --minify",
+		"watch": "npm run build -- --watch",
+		"pack": "npm run build && vsce package --pre-release",
+		"release": "npm run build && vsce publish --pre-release"
+	},
+	"devDependencies": {
+		"@tsconfig-helper/language-server": "0.0.1",
+		"@types/vscode": "1.67.0",
+		"@volar/language-server": "1.4.0-alpha.7",
+		"@volar/vscode": "1.4.0-alpha.7",
+		"esbuild": "0.15.18",
+		"vsce": "latest",
+		"vscode-languageclient": "^8.1.0"
+	}
+}

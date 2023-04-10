@@ -11,9 +11,13 @@
 		"watch:esbuild": "cd ./packages/vscode && npm run watch",
 		"prerelease": "npm run build",
 		"pack": "cd ./packages/vscode && npm run pack",
-		"release": "cd ./packages/vscode && npm run release"
+		"release": "npm run release:packages && npm run release:vscode",
+		"release:packages": "lerna publish --exact --force-publish --yes --sync-workspace-lock",
+		"release:vscode": "cd ./packages/vscode && npm run release"
 	},
 	"devDependencies": {
+		"@lerna-lite/cli": "latest",
+		"@lerna-lite/publish": "latest",
 		"@types/node": "latest",
 		"typescript": "latest"
 	}

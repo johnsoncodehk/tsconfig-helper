@@ -8,6 +8,10 @@ let client: lsp.BaseLanguageClient;
 
 export function activate(context: vscode.ExtensionContext) {
 
+	if (!vscode.workspace.getConfiguration('editor').get<boolean>('codeLens')) {
+		vscode.window.showInformationMessage('Please enable "editor.codeLens" to use TSConfig Helper.');
+	}
+
 	context.subscriptions.push(vscode.commands.registerCommand("tsconfig-helper.showReferences", async (...args: any) => {
 
 		const config = vscode.workspace.getConfiguration('references');

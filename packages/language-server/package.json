@@ -1,6 +1,6 @@
 {
 	"name": "@tsconfig-helper/language-server",
-	"version": "0.0.1",
+	"version": "0.3.0",
 	"main": "out/index.js",
 	"license": "MIT",
 	"files": [

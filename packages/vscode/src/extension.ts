@@ -14,17 +14,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand("tsconfig-helper.showReferences", async (...args: any) => {
 
+		// https://github.com/microsoft/vscode/blob/70627146825d91fd61a9e00fb6fe75b9f01dbff1/extensions/markdown-language-features/src/languageFeatures/fileReferences.ts#L35-L43
 		const config = vscode.workspace.getConfiguration('references');
-		const existingSetting = config.get('preferredLocation', undefined);
+		const existingSetting = config.inspect<string>('preferredLocation');
 
 		await config.update('preferredLocation', 'view');
 		try {
-			await vscode.commands.executeCommand(
-				'editor.action.showReferences',
-				...args,
-			);
+			await vscode.commands.executeCommand('editor.action.showReferences', ...args);
 		} finally {
-			await config.update('preferredLocation', existingSetting);
+			await config.update('preferredLocation', existingSetting?.workspaceFolderValue ?? existingSetting?.workspaceValue);
 		}
 	}));
 

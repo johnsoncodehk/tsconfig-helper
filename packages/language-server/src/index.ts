@@ -1,6 +1,6 @@
-import { LanguageServerInitializationOptions } from '@volar/language-server/node';
+import { InitializationOptions as _InitializationOptions } from '@volar/language-server/node';
 
-export interface InitializationOptions extends LanguageServerInitializationOptions {
+export interface InitializationOptions extends _InitializationOptions {
     tsconfigHelper?: {
         extraFileExtensions?: string[];
     };

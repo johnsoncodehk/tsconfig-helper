@@ -1,4 +1,4 @@
-import { createConnection, startLanguageServer, LanguageServerPlugin, LanguageServicePluginInstance } from '@volar/language-server/node';
+import { createConnection, startLanguageServer, LanguageServerPlugin, Service } from '@volar/language-server/node';
 import * as vscode from '@volar/language-service';
 import type * as ts from 'typescript/lib/tsserverlibrary';
 import * as jsonc from 'jsonc-parser';
@@ -13,11 +13,11 @@ interface CodeLensData {
 	isTotal?: boolean,
 }
 
-const plugin: LanguageServerPlugin = (initOptions: InitializationOptions): ReturnType<LanguageServerPlugin> => ({
+const plugin: LanguageServerPlugin = (initOptions: InitializationOptions, modules): ReturnType<LanguageServerPlugin> => ({
 	resolveConfig(config) {
 
-		config.plugins ??= {};
-		config.plugins['tsconfig-helper'] ??= (context): LanguageServicePluginInstance => ({
+		config.services ??= {};
+		config.services['tsconfig-helper'] ??= (context): ReturnType<Service> => ({
 			provideCodeLenses(document) {
 
 				const codeLenses: vscode.CodeLens[] = [];
@@ -147,14 +147,14 @@ const plugin: LanguageServerPlugin = (initOptions: InitializationOptions): Retur
 			},
 			async resolveCodeLens(codeLens) {
 
-				const ts = context!.typescript!.module;
+				const ts = modules!.typescript!;
 				const extraFileExtensions = (initOptions.tsconfigHelper?.extraFileExtensions ?? []).map<ts.FileExtensionInfo>(ext => ({
 					extension: ext,
 					isMixedContent: true,
 					scriptKind: ts.ScriptKind.Deferred,
 				}));
 				const data: CodeLensData = codeLens.data;
-				const fileName = context!.uriToFileName(data.uri);
+				const fileName = context!.env.uriToFileName(data.uri);
 				const beforeFiles = new Set(data.beforeOptions ? ts.parseJsonConfigFileContent(
 					data.beforeOptions,
 					ts.sys,
@@ -189,12 +189,12 @@ const plugin: LanguageServerPlugin = (initOptions: InitializationOptions): Retur
 
 				const num = addFileNames.size + removeFileNames.size;
 				if (num) {
-					codeLens.command = context?.commands.createShowReferencesCommand(
+					codeLens.command = context?.commands.showReferences.create(
 						data.uri,
 						data.position,
 						[...addFileNames, ...removeFileNames].map<vscode.Location>(fileName => {
 							return vscode.Location.create(
-								context!.fileNameToUri(fileName),
+								context!.env.fileNameToUri(fileName),
 								vscode.Range.create(0, 0, 0, 0),
 							);
 						})

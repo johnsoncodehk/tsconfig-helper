@@ -1,5 +1,5 @@
-import { InitializationOptions } from '@tsconfig-helper/language-server';
-import { middleware } from '@volar/vscode';
+import { InitializationOptions, protocol } from '@tsconfig-helper/language-server';
+import { middleware, ExportsInfoForLabs } from '@volar/vscode';
 import * as vscode from 'vscode';
 import * as lsp from 'vscode-languageclient/node';
 import * as path from 'path';
@@ -62,7 +62,15 @@ export function activate(context: vscode.ExtensionContext) {
 			},
 		},
 	);
-	return client.start();
+	client.start();
+
+	return {
+		volarLabs: {
+			version: '1.6.2',
+			languageClients: [client],
+			languageServerProtocol: protocol,
+		}
+	} satisfies ExportsInfoForLabs;
 }
 
 export function deactivate(): Thenable<any> | undefined {

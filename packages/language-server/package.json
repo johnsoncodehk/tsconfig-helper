@@ -11,8 +11,8 @@
 		"tsconfig-helper-language-server": "./bin/tsconfig-helper-language-server.js"
 	},
 	"dependencies": {
-		"@volar/language-server": "1.6.4",
-		"@volar/language-service": "1.6.4",
+		"@volar/language-server": "~1.9.0",
+		"@volar/language-service": "~1.9.0",
 		"jsonc-parser": "^3.2.0"
 	}
 }

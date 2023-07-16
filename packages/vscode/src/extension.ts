@@ -1,8 +1,8 @@
 import { InitializationOptions, protocol } from '@tsconfig-helper/language-server';
-import { middleware, ExportsInfoForLabs } from '@volar/vscode';
+import { ExportsInfoForLabs, middleware, supportLabsVersion } from '@volar/vscode';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as lsp from 'vscode-languageclient/node';
-import * as path from 'path';
 
 let client: lsp.BaseLanguageClient;
 
@@ -64,7 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	return {
 		volarLabs: {
-			version: '1.6.2',
+			version: supportLabsVersion,
 			languageClients: [client],
 			languageServerProtocol: protocol,
 		}

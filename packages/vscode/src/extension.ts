@@ -27,6 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}));
 
+	const extraFileExtensions: string[] = [];
+
+	if (vscode.extensions.getExtension('Vue.volar')) {
+		extraFileExtensions.push('vue');
+	}
+	if (vscode.extensions.getExtension('astro-build.astro-vscode')) {
+		extraFileExtensions.push('astro');
+	}
+
 	client = new lsp.LanguageClient(
 		'tsconfig-helper-language-server',
 		'TSConfig Helper',
@@ -46,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 					tsdk: path.join(vscode.env.appRoot, 'extensions/node_modules/typescript/lib'),
 				},
 				tsconfigHelper: {
-					extraFileExtensions: vscode.workspace.getConfiguration('tsconfig-helper').get<string[]>('extraFileExtensions') ?? [],
+					extraFileExtensions,
 				},
 			} satisfies InitializationOptions,
 			middleware: {

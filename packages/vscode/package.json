@@ -20,22 +20,6 @@
 	"activationEvents": [
 		"onLanguage:jsonc"
 	],
-	"contributes": {
-		"configuration": {
-			"title": "TSConfig Helper",
-			"properties": {
-				"tsconfig-helper.extraFileExtensions": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": [
-						"vue"
-					]
-				}
-			}
-		}
-	},
 	"main": "client",
 	"scripts": {
 		"prebuild": "cd ../.. && npm run build",

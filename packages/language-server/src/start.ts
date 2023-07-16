@@ -187,8 +187,8 @@ const plugin: LanguageServerPlugin = (initOptions: InitializationOptions, module
 					}
 				}
 
-				const num = addFileNames.size + removeFileNames.size;
-				if (num) {
+				const all = [...addFileNames, ...removeFileNames];
+				if (all.length) {
 					codeLens.command = context?.commands.showReferences.create(
 						data.uri,
 						data.position,
@@ -208,7 +208,18 @@ const plugin: LanguageServerPlugin = (initOptions: InitializationOptions, module
 					};
 				}
 				if (codeLens.command) {
-					codeLens.command.title = num + (data.isTotal ? ' files' : ' matches');
+					codeLens.command.title = all.length + (data.isTotal ? ' root files' : ' matches');
+					if (data.isTotal && initOptions.tsconfigHelper?.extraFileExtensions?.length) {
+						const exts = initOptions.tsconfigHelper.extraFileExtensions;
+						const extraText = exts
+							.map(ext => [ext, all.filter(file => file.endsWith('.' + ext))])
+							.filter(([_, files]) => files.length)
+							.map(([ext, files]) => `${files.length} ${ext} files`)
+							.join(', ');
+						if (extraText !== '') {
+							codeLens.command.title += ` (${extraText})`
+						}
+					}
 				}
 
 				return codeLens;

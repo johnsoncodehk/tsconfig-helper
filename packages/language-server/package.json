@@ -12,7 +12,6 @@
 	},
 	"dependencies": {
 		"@volar/language-server": "~1.9.0",
-		"@volar/language-service": "~1.9.0",
 		"jsonc-parser": "^3.2.0"
 	}
 }

@@ -5,5 +5,3 @@ export interface InitializationOptions extends _InitializationOptions {
         extraFileExtensions?: string[];
     };
 }
-
-export * as protocol from '@volar/language-server/protocol';

@@ -1,5 +1,5 @@
 import { createConnection, startLanguageServer, LanguageServerPlugin, Service } from '@volar/language-server/node';
-import * as vscode from '@volar/language-service';
+import * as vscode from '@volar/language-server';
 import type * as ts from 'typescript/lib/tsserverlibrary';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';

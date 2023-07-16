@@ -1,4 +1,5 @@
-import { InitializationOptions, protocol } from '@tsconfig-helper/language-server';
+import type { InitializationOptions } from '@tsconfig-helper/language-server';
+import * as protocol from '@volar/language-server/protocol';
 import { ExportsInfoForLabs, middleware, supportLabsVersion } from '@volar/vscode';
 import * as path from 'path';
 import * as vscode from 'vscode';

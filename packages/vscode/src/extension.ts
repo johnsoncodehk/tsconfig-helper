@@ -35,6 +35,9 @@ export function activate(context: vscode.ExtensionContext) {
 	if (vscode.extensions.getExtension('astro-build.astro-vscode')) {
 		extraFileExtensions.push('astro');
 	}
+	if (vscode.extensions.getExtension('svelte.svelte-vscode')) {
+		extraFileExtensions.push('svelte');
+	}
 
 	client = new lsp.LanguageClient(
 		'tsconfig-helper-language-server',

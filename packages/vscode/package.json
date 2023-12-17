@@ -25,8 +25,8 @@
 		"prebuild": "cd ../.. && npm run build",
 		"build": "node scripts/build -- --minify",
 		"watch": "npm run build -- --watch",
-		"pack": "npm run build && vsce package --pre-release",
-		"release": "npm run build && vsce publish --pre-release"
+		"pack": "npm run build && vsce package",
+		"release": "npm run build && vsce publish"
 	},
 	"devDependencies": {
 		"@tsconfig-helper/language-server": "0.4.2",

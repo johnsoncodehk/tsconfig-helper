@@ -33,7 +33,7 @@ importers:
   packages/vscode:
     devDependencies:
       '@tsconfig-helper/language-server':
-        specifier: 0.4.1
+        specifier: 0.4.2
         version: link:../language-server
       '@types/vscode':
         specifier: 1.67.0
@@ -2182,6 +2182,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     dev: true

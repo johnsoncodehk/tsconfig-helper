@@ -38,6 +38,9 @@ export function activate(context: vscode.ExtensionContext) {
 	if (vscode.extensions.getExtension('svelte.svelte-vscode')) {
 		extraFileExtensions.push('svelte');
 	}
+	if (vscode.extensions.getExtension('unifiedjs.vscode-mdx')) {
+		extraFileExtensions.push('mdx');
+	}
 
 	client = new lsp.LanguageClient(
 		'tsconfig-helper-language-server',

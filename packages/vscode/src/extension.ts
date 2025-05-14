@@ -18,12 +18,24 @@ export function activate(context: vscode.ExtensionContext) {
 		// https://github.com/microsoft/vscode/blob/70627146825d91fd61a9e00fb6fe75b9f01dbff1/extensions/markdown-language-features/src/languageFeatures/fileReferences.ts#L35-L43
 		const config = vscode.workspace.getConfiguration('references');
 		const existingSetting = config.inspect<string>('preferredLocation');
+		const workspaceValue = existingSetting?.workspaceFolderValue ?? existingSetting?.workspaceValue;
 
-		await config.update('preferredLocation', 'view');
-		try {
-			await vscode.commands.executeCommand('editor.action.showReferences', ...args);
-		} finally {
-			await config.update('preferredLocation', existingSetting?.workspaceFolderValue ?? existingSetting?.workspaceValue);
+		if (workspaceValue) {
+			await config.update('preferredLocation', 'view');
+			try {
+				await vscode.commands.executeCommand('editor.action.showReferences', ...args);
+			} finally {
+				await config.update('preferredLocation', workspaceValue);
+			}
+		}
+		else {
+			// #3
+			await config.update('preferredLocation', 'view', vscode.ConfigurationTarget.Global);
+			try {
+				await vscode.commands.executeCommand('editor.action.showReferences', ...args);
+			} finally {
+				await config.update('preferredLocation', existingSetting?.globalValue, vscode.ConfigurationTarget.Global);
+			}
 		}
 	}));
 

@@ -52,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 		},
 		{
 			documentSelector: [
+				{ language: 'jsonc', pattern: '**/jsconfig.json' },
+				{ language: 'jsonc', pattern: '**/jsconfig.*.json' },
+				{ language: 'jsonc', pattern: '**/jsconfig-*.json' },
 				{ language: 'jsonc', pattern: '**/tsconfig.json' },
 				{ language: 'jsonc', pattern: '**/tsconfig.*.json' },
 				{ language: 'jsonc', pattern: '**/tsconfig-*.json' },

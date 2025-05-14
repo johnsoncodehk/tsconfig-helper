@@ -36,7 +36,7 @@ importers:
   packages/vscode:
     devDependencies:
       '@tsconfig-helper/language-server':
-        specifier: 0.4.3
+        specifier: 0.4.4
         version: link:../language-server
       '@types/vscode':
         specifier: 1.67.0

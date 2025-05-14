@@ -31,10 +31,9 @@
 	"devDependencies": {
 		"@tsconfig-helper/language-server": "0.4.3",
 		"@types/vscode": "1.67.0",
-		"@volar/language-server": "~1.9.0",
-		"@volar/vscode": "~1.9.0",
+		"@volar/language-server": "~2.4.13",
+		"@volar/vscode": "~2.4.13",
 		"esbuild": "0.15.18",
-		"vsce": "latest",
-		"vscode-languageclient": "^8.1.0"
+		"vsce": "latest"
 	}
 }
